@@ -444,10 +444,138 @@
        energy_total_value, frequency_value, pf_value, status_text,
        status_badge, updated_time, extra_value
   -->
-  <!--
-  <script>
 
+  <!-- JS EraWidget -->
+  <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
+  <script>
+    // Biến lưu config từ Era
+    let cfgVoltage = null;
+    let cfgCurrent = null;
+    let cfgPower = null;
+    let cfgEnergy = null;
+    let cfgFrequency = null;
+    let cfgPf = null;
+    let cfgEnergyTotal = null;
+
+    const $ = (id) => document.getElementById(id);
+
+    function formatNumber(val, decimals) {
+      const num = Number(val);
+      if (Number.isNaN(num)) return val;
+      return num.toFixed(decimals);
+    }
+
+    function updateStatus(power, voltage, pf) {
+      const badgeEl = $('status_badge');
+      const textEl = $('status_text');
+
+      let status = 'Stable';
+      let msg = 'Không quá tải, điện áp ổn định';
+
+      const p = Number(power);
+      const v = Number(voltage);
+      const pfNum = Number(pf);
+
+      if (!Number.isNaN(p) && p > 3500) {
+        status = 'Overload';
+        msg = 'Cảnh báo quá tải công suất';
+      }
+
+      if (!Number.isNaN(v) && (v < 200 || v > 250)) {
+        status = 'Voltage';
+        msg = 'Điện áp ngoài dải an toàn';
+      }
+
+      if (!Number.isNaN(pfNum) && pfNum < 0.9) {
+        status = 'PF Low';
+        msg = 'Hệ số công suất thấp hơn mức khuyến nghị';
+      }
+
+      badgeEl.textContent = status;
+      textEl.textContent = msg;
+    }
+
+    function updateTime() {
+      const now = new Date();
+      $('updated_time').textContent =
+        'Updated: ' + now.toLocaleTimeString('vi-VN', { hour12: false });
+    }
+
+    const eraWidget = new EraWidget();
+
+    eraWidget.init({
+      needRealtimeConfigs: true,
+      needHistoryConfigs: true,
+      needActions: false,
+      maxRealtimeConfigsCount: 10,
+      maxHistoryConfigsCount: 0,
+      maxActionsCount: 0,
+      minRealtimeConfigsCount: 0,
+      minHistoryConfigsCount: 0,
+      minActionsCount: 0,
+
+      // Nhận danh sách config từ server
+      onConfiguration: (configuration) => {
+        const rt = configuration.realtime_configs || [];
+
+        // Map theo thứ tự bạn cấu hình trong Era
+        cfgVoltage     = rt[0] || null; // V
+        cfgCurrent     = rt[1] || null; // A
+        cfgPower       = rt[2] || null; // W
+        cfgEnergy      = rt[3] || null; // kWh hiện tại / hôm nay
+        cfgFrequency   = rt[4] || null; // Hz
+        cfgPf          = rt[5] || null; // Power Factor
+        cfgEnergyTotal = rt[6] || null; // kWh tổng
+
+        // Hiển thị trạng thái server
+        $('extra_value').textContent = 'OK';
+      },
+
+      // Nhận giá trị realtime
+      onValues: (values) => {
+        let power = null;
+        let voltage = null;
+        let pf = null;
+
+        if (cfgVoltage && values[cfgVoltage.id]) {
+          voltage = values[cfgVoltage.id].value;
+          $('voltage_value').textContent = formatNumber(voltage, 1);
+        }
+
+        if (cfgCurrent && values[cfgCurrent.id]) {
+          const current = values[cfgCurrent.id].value;
+          $('current_value').textContent = formatNumber(current, 2);
+        }
+
+        if (cfgPower && values[cfgPower.id]) {
+          power = values[cfgPower.id].value;
+          $('power_value').textContent = formatNumber(power, 0);
+        }
+
+        if (cfgEnergy && values[cfgEnergy.id]) {
+          const energy = values[cfgEnergy.id].value;
+          $('energy_value').textContent = formatNumber(energy, 2);
+        }
+
+        if (cfgEnergyTotal && values[cfgEnergyTotal.id]) {
+          const et = values[cfgEnergyTotal.id].value;
+          $('energy_total_value').textContent = formatNumber(et, 2);
+        }
+
+        if (cfgFrequency && values[cfgFrequency.id]) {
+          const freq = values[cfgFrequency.id].value;
+          $('frequency_value').textContent = formatNumber(freq, 2);
+        }
+
+        if (cfgPf && values[cfgPf.id]) {
+          pf = values[cfgPf.id].value;
+          $('pf_value').textContent = formatNumber(pf, 2);
+        }
+
+        updateStatus(power, voltage, pf);
+        updateTime();
+      }
+    });
   </script>
-  -->
 </body>
 </html>
