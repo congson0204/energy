@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Energy Monitor Widget</title>
+  <style>
+    :root {
+      --bg: #020617;
+      --card-bg: rgba(15, 23, 42, 0.96);
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.16);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #f97373;
+      --radius-lg: 16px;
+      --radius-xl: 22px;
+      --shadow-soft: 0 18px 35px rgba(15, 23, 42, 0.8);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #0f172a 0%, #020617 55%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+
+    .energy-widget {
+      width: 100%;
+      max-width: 420px;
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.94));
+      border-radius: 24px;
+      box-shadow: var(--shadow-soft);
+      padding: 14px 14px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .energy-widget::before {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(34, 197, 94, 0.35), transparent 60%);
+      top: -120px;
+      right: -90px;
+      filter: blur(2px);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .widget-header {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .widget-title {
+      font-size: 18px;
+      font-weight: 620;
+      letter-spacing: 0.03em;
+    }
+
+    .widget-subtitle {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .chip {
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(15, 23, 42, 0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+    }
+
+    .main-card {
+      position: relative;
+      margin-bottom: 12px;
+      border-radius: var(--radius-xl);
+      padding: 12px;
+      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.18), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.22), transparent 65%),
+                  var(--card-bg);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      display: flex;
+      gap: 10px;
+    }
+
+    .main-left {
+      flex: 1.1;
+    }
+
+    .main-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .main-value {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .main-value-number {
+      font-size: 26px;
+      font-weight: 650;
+    }
+
+    .unit {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .main-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .main-pill {
+      flex: 1;
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 11px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+    }
+
+    .main-pill strong {
+      color: var(--text);
+    }
+
+    .main-right {
+      width: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .power-ring {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background:
+        conic-gradient(from 210deg,
+          rgba(34, 197, 94, 0.0) 0deg,
+          rgba(34, 197, 94, 0.7) 220deg,
+          rgba(148, 163, 184, 0.2) 360deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+
+    .power-ring-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.38);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .power-ring-label {
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .power-ring-value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .metric-card {
+      border-radius: var(--radius-lg);
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(30, 64, 175, 0.4);
+      padding: 8px 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-height: 60px;
+    }
+
+    .metric-card.accent {
+      background: radial-gradient(circle at top left, var(--accent-soft), rgba(15, 23, 42, 0.98));
+      border-color: rgba(34, 197, 94, 0.75);
+    }
+
+    .metric-card.warning {
+      border-color: rgba(248, 113, 113, 0.7);
+    }
+
+    .metric-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .metric-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 11px;
+    }
+
+    .metric-name {
+      font-weight: 520;
+    }
+
+    .metric-value-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .metric-value {
+      font-size: 16px;
+      font-weight: 620;
+    }
+
+    .metric-sub {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .footer-bar {
+      margin-top: 10px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+    }
+
+    .status-badge {
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      background: rgba(22, 163, 74, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.6);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    @media (max-width: 360px) {
+      .main-card {
+        flex-direction: column;
+      }
+
+      .main-right {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 4px;
+      }
+
+      .power-ring {
+        margin-left: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="energy-widget" id="energy_widget_root">
+    <!-- Header -->
+    <div class="widget-header">
+      <div>
+        <div class="widget-title">Đo điện năng tiêu thụ</div>
+        <div class="widget-subtitle"></div>
+      </div>
+      <div class="chip">
+        <span class="chip-dot"></span>
+        Live
+      </div>
+    </div>
+
+    <!-- Khối chính: Power, Voltage, Current -->
+    <div class="main-card">
+      <div class="main-left">
+        <div class="main-label">Công suất hiện tại</div>
+        <div class="main-value">
+          <span class="main-value-number" id="power_value">1234</span>
+          <span class="unit">W</span>
+        </div>
+
+        <div class="main-row">
+          <div class="main-pill">
+            <span>Điện áp</span>
+            <strong>
+              <span id="voltage_value">230.5</span>
+              <span class="unit">V</span>
+            </strong>
+          </div>
+          <div class="main-pill">
+            <span>Dòng điện</span>
+            <strong>
+              <span id="current_value">5.36</span>
+              <span class="unit">A</span>
+            </strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-right">
+        <div class="power-ring">
+          <div class="power-ring-inner">
+            <div class="power-ring-label">Năng lượng</div>
+            <div class="power-ring-value" id="energy_value">3.27</div>
+            <div class="unit">kWh</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid chi tiết -->
+    <div class="metrics-grid">
+      <!-- Frequency -->
+      <div class="metric-card accent">
+        <div class="metric-header">
+          <div class="metric-icon">🌊</div>
+          <div class="metric-name">Frequency</div>
+        </div>
+        <div class="metric-value-row">
+          <span class="metric-value" id="frequency_value">49.98</span>
+          <span class="unit">Hz</span>
+        </div>
+        <div class="metric-sub">Tần số</div>
+      </div>
+
+      <!-- Power Factor -->
+      <div class="metric-card warning">
+        <div class="metric-header">
+          <div class="metric-icon">⚙</div>
+          <div class="metric-name">Power Factor</div>
+        </div>
+        <div class="metric-value-row">
+          <span class="metric-value" id="pf_value">0.97</span>
+        </div>
+        <div class="metric-sub">PF chuẩn: 0.95–1.00</div>
+      </div>
+
+      <!-- Energy tổng -->
+      <div class="metric-card">
+        <div class="metric-header">
+          <div class="metric-icon">📊</div>
+          <div class="metric-name">Energy total</div>
+        </div>
+        <div class="metric-value-row">
+          <span class="metric-value" id="energy_total_value">12.45</span>
+          <span class="unit">kWh</span>
+        </div>
+        <div class="metric-sub">Tổng năng lượng tiêu thụ</div>
+      </div>
+
+      <!-- Dự phòng hiển thị khác nếu cần -->
+      <div class="metric-card">
+        <div class="metric-header">
+          <div class="metric-icon">🧩</div>
+          <div class="metric-name">Server</div>
+        </div>
+        <div class="metric-value-row">
+          <span class="metric-value" id="extra_value">OK</span>
+        </div>
+        <div class="metric-sub">Trạng thái kết nối </div>
+      </div>
+    </div>
+
+    <!-- Thanh trạng thái -->
+    <div class="footer-bar">
+      <div class="footer-left">
+        <span class="status-badge" id="status_badge">Stable</span>
+        <span id="status_text">Không quá tải, điện áp ổn định</span>
+      </div>
+      <span style="font-size:10px; color:var(--muted);" id="updated_time">Updated: now</span>
+    </div>
+  </div>
+
+  <!-- Ghi chú cho Era Platform:
+       Bạn chỉ cần set textContent các id:
+       voltage_value, current_value, power_value, energy_value,
+       energy_total_value, frequency_value, pf_value, status_text,
+       status_badge, updated_time, extra_value
+  -->
+  <!--
+  <script>
+
+  </script>
+  -->
+</body>
+</html>
