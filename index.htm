@@ -26,22 +26,19 @@
     }
 
     body {
-        background: transparent;   /* hoặc bỏ dòng background luôn */
-         color: var(--text);
-        min-height: auto;
-        display: block;
-        padding: 0;
+         background: transparent;   /* hoặc giữ màu bạn muốn */
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+  display: block;            /* bỏ flex */
+  min-height: auto;          /* bỏ 100vh */
     }
 
     .energy-widget {
       width: 100%;
-      max-width: 420px;
-      background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.94));
-      border-radius: 24px;
-      box-shadow: var(--shadow-soft);
-      padding: 14px 14px 16px;
-      position: relative;
-      overflow: hidden;
+  max-width: 100%;           /* full theo iframe, không bị thừa */
+  border-radius: 0;          /* nếu muốn sát mép khung */
+  box-shadow: none;          /* tùy, để bớt cảm giác “hộp” */
     }
 
     .energy-widget::before {
@@ -577,6 +574,7 @@
   </script>
 </body>
 </html>
+
 
 
 
