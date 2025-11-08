@@ -612,9 +612,24 @@
         updateTime();
       }
     });
+
+    const $ = (id) => document.getElementById(id);
+
+// --- Lưu và khôi phục đơn giá 1 kWh ---
+const unitInput = $('unit_price');
+
+// Khôi phục giá trị khi tải trang
+unitInput.value = localStorage.getItem('unit_price') || 3500;
+
+// Lưu mỗi khi người dùng thay đổi
+unitInput.addEventListener('input', () => {
+  localStorage.setItem('unit_price', unitInput.value);
+});
+
   </script>
 </body>
 </html>
+
 
 
 
