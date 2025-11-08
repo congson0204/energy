@@ -595,7 +595,7 @@
             const unitPrice = Number($('unit_price').value) || 3500;
   // Tính tiền điện = tổng điện năng * đơn giá
              const charge = et * unitPrice;
-             $('electricity_charge_value').textContent = formatNumber(charge, 0);
+             $('electricity_charge_value').textContent = charge.toLocaleString('en-US');
         }
 
         if (cfgFrequency && values[cfgFrequency.id]) {
@@ -629,6 +629,7 @@ unitInput.addEventListener('input', () => {
   </script>
 </body>
 </html>
+
 
 
 
