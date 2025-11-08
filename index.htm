@@ -592,7 +592,7 @@
           const et = values[cfgEnergyTotal.id].value;
           $('energy_total_value').textContent = formatNumber(et, 2);
             
-            const unitPrice = Number($('unit_price').value) || 2500;
+            const unitPrice = Number($('unit_price').value) || 3500;
   // Tính tiền điện = tổng điện năng * đơn giá
              const charge = et * unitPrice;
              $('electricity_charge_value').textContent = formatNumber(charge, 0);
@@ -615,6 +615,7 @@
   </script>
 </body>
 </html>
+
 
 
 
