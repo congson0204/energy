@@ -306,6 +306,30 @@
         margin-left: 4px;
       }
     }
+    .metric-input {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+}
+.metric-input label {
+  font-size: 14px;
+  color: #9ca3af;
+  margin-right: 6px;
+}
+.metric-input input {
+  font-size: 14px;
+  padding: 4px 6px;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  background-color: #0f172a;
+  color: #e5e7eb;
+}
+.metric-input span {
+  margin-left: 4px;
+  color: #9ca3af;
+}
+    
+    
   </style>
 </head>
 <body>
@@ -397,7 +421,7 @@
           <span class="metric-value" id="energy_total_value">12.45</span>
           <span class="unit">kWh</span>
         </div>
-        <div class="metric-sub">Tổng năng lượng tiêu thụ</div>
+        <div class="metric-sub">Tổng năng lượng tiêu thụ trong 1 tháng</div>
       </div>
 
       <!-- Dự phòng hiển thị khác nếu cần -->
@@ -412,6 +436,27 @@
         <div class="metric-sub">Trạng thái kết nối </div>
       </div>
     </div>
+       
+ <!-- Grid chi tiết -->
+    <div class="metrics-grid">
+      <!-- Frequency -->
+      <div class="metric-card accent">
+        <div class="metric-header">
+          <div class="metric-icon">🌊</div>
+          <div class="metric-name">Electricity charge</div>
+        </div>
+        <div class="metric-value-row">
+          <span class="metric-value" id="electricity_charge_value">4,000</span>
+          <span class="unit">VND</span>
+        </div>
+        <div class="metric-sub">Tiền điện trong 1 tháng</div>
+        <div class="metric-input">
+  <label for="unit_price">Đơn giá 1 kWh điện:</label>
+  <input type="number" id="unit_price" placeholder="2500" style="width:100px; text-align:right;"> <span>VND</span>
+</div>
+      </div>
+
+     
 
     <!-- Thanh trạng thái -->
     <div class="footer-bar">
@@ -545,6 +590,11 @@
         if (cfgEnergyTotal && values[cfgEnergyTotal.id]) {
           const et = values[cfgEnergyTotal.id].value;
           $('energy_total_value').textContent = formatNumber(et, 2);
+            
+            const unitPrice = Number($('unit_price').value) || 2500;
+  // Tính tiền điện = tổng điện năng * đơn giá
+             const charge = et * unitPrice;
+             $('electricity_charge_value').textContent = formatNumber(charge, 0);
         }
 
         if (cfgFrequency && values[cfgFrequency.id]) {
@@ -564,7 +614,6 @@
   </script>
 </body>
 </html>
-
 
 
 
