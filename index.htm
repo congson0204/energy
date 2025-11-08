@@ -213,10 +213,13 @@
     }
 
     .metric-card.accent {
+    
       background: radial-gradient(circle at top left, var(--accent-soft), rgba(15, 23, 42, 0.98));
       border-color: rgba(34, 197, 94, 0.75);
     }
-
+    .metrics-grid + .metrics-grid {
+         margin-top: 10px; /* hoặc 12–16px tùy độ thoáng bạn muốn */
+    }
     .metric-card.warning {
       border-color: rgba(248, 113, 113, 0.7);
     }
@@ -261,9 +264,9 @@
     }
 
     .footer-bar {
-      margin-top: 10px;
+    
       padding: 6px 8px;
-      border-radius: 999px;
+      border-radius: 8px;
       font-size: 11px;
       background: rgba(15, 23, 42, 0.95);
       border: 1px solid rgba(148, 163, 184, 0.3);
@@ -282,7 +285,7 @@
 
     .status-badge {
       padding: 2px 7px;
-      border-radius: 999px;
+      border-radius: 8px;
       font-size: 10px;
       background: rgba(22, 163, 74, 0.1);
       border: 1px solid rgba(34, 197, 94, 0.6);
@@ -307,6 +310,7 @@
       }
     }
     .metric-input {
+        
   margin-top: 8px;
   display: flex;
   align-items: center;
@@ -453,10 +457,8 @@
         <div class="metric-input">
   <label for="unit_price">Đơn giá 1 kWh điện:</label>
   <input type="number" id="unit_price" placeholder="2500" style="width:100px; text-align:right;"> <span>VND</span>
-</div>
+        </div>
       </div>
-
-     
 
     <!-- Thanh trạng thái -->
     <div class="footer-bar">
@@ -579,13 +581,12 @@
 
         if (cfgPower && values[cfgPower.id]) {
           power = values[cfgPower.id].value;
+          const energy=power*0.001;
           $('power_value').textContent = formatNumber(power, 0);
-        }
-
-        if (cfgEnergy && values[cfgEnergy.id]) {
-          const energy = values[cfgEnergy.id].value;
           $('energy_value').textContent = formatNumber(energy, 2);
         }
+
+        
 
         if (cfgEnergyTotal && values[cfgEnergyTotal.id]) {
           const et = values[cfgEnergyTotal.id].value;
